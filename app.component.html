@@ -1,0 +1,121 @@
+@if (showSplash()) {
+  <app-splash></app-splash>
+} @else {
+  <div class="flex flex-col h-full font-sans text-gray-100">
+    
+    <!-- Top Bar (Glass) -->
+    <header class="fixed top-0 w-full z-30 glass-panel border-b-0 border-white/5">
+      <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-2 h-8 bg-gradient-to-b from-amber-400 to-amber-600 rounded-full"></div>
+          <div>
+            <!-- UPDATED HEADER WITH ORBITRON FONT -->
+            <h1 class="text-sm md:text-lg font-bold text-white tracking-widest leading-none font-brand">
+              DIMENSI TRADER
+              <span class="text-[10px] text-amber-500 font-normal block tracking-[0.3em] mt-0.5">BY XHIVAS</span>
+            </h1>
+          </div>
+        </div>
+        
+        <!-- Realtime Clock Display -->
+        <div class="flex flex-col items-end justify-center bg-white/5 px-3 py-1 rounded-lg border border-white/5 backdrop-blur-md">
+           <span class="text-[9px] text-gray-400 font-medium tracking-wide uppercase">{{ now() | date:'EEE, dd MMM' }}</span>
+           <span class="text-sm font-mono font-bold text-amber-500 tabular-nums leading-none tracking-tight">{{ now() | date:'HH:mm:ss' }}</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Area (Scrollable with padding for fixed header/footer) -->
+    <main class="flex-1 overflow-y-auto no-scrollbar pt-16 pb-28">
+      <div class="p-4 max-w-4xl mx-auto w-full animate-fade-in">
+        @switch (currentView()) {
+          @case ('dashboard') {
+            <app-dashboard></app-dashboard>
+          }
+          @case ('signals') {
+            <app-signal-dashboard></app-signal-dashboard>
+          }
+          @case ('plan') {
+            <app-trade-form (viewChange)="switchView($event)"></app-trade-form>
+          }
+          @case ('journal') {
+            <!-- Listen for request to create new trade -->
+            <app-trade-list (onRequestNewTrade)="switchView('plan')"></app-trade-list>
+          }
+          @case ('menu') {
+            <app-menu></app-menu>
+          }
+        }
+      </div>
+    </main>
+
+    <!-- Bottom Navigation (Floating Dock) - REMOVED BIG BUTTON -->
+    <div class="fixed bottom-0 w-full z-30 pb-4 pt-2 px-2 pointer-events-none">
+      <nav class="max-w-md mx-auto bg-[#1a1a1a]/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-1 pointer-events-auto">
+        <div class="grid grid-cols-4 items-center relative">
+          
+          <!-- Home -->
+          <button 
+            (click)="switchView('dashboard')"
+            class="flex flex-col items-center py-3 rounded-xl transition-all duration-300 mx-1"
+            [class.text-amber-500]="currentView() === 'dashboard'"
+            [class.text-gray-500]="currentView() !== 'dashboard'"
+            [class.bg-white/5]="currentView() === 'dashboard'"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mb-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+            </svg>
+            <span class="text-[9px] font-medium tracking-wide">{{ dataService.t().nav_home }}</span>
+          </button>
+
+          <!-- Signals -->
+          <button 
+            (click)="switchView('signals')"
+            class="flex flex-col items-center py-3 rounded-xl transition-all duration-300 mx-1"
+            [class.text-amber-500]="currentView() === 'signals'"
+            [class.text-gray-500]="currentView() !== 'signals'"
+            [class.bg-white/5]="currentView() === 'signals'"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mb-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            <span class="text-[9px] font-medium tracking-wide">{{ dataService.t().nav_signal }}</span>
+          </button>
+
+          <!-- Journal (Replaced Plan Button) -->
+          <button 
+            (click)="switchView('journal')"
+            class="flex flex-col items-center py-3 rounded-xl transition-all duration-300 mx-1"
+            [class.text-amber-500]="currentView() === 'journal' || currentView() === 'plan'"
+            [class.text-gray-500]="currentView() !== 'journal' && currentView() !== 'plan'"
+            [class.bg-white/5]="currentView() === 'journal' || currentView() === 'plan'"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mb-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+            <span class="text-[9px] font-medium tracking-wide">{{ dataService.t().nav_journal }}</span>
+          </button>
+
+          <!-- Menu -->
+           <button 
+            (click)="switchView('menu')"
+            class="flex flex-col items-center py-3 rounded-xl transition-all duration-300 mx-1"
+            [class.text-amber-500]="currentView() === 'menu'"
+            [class.text-gray-500]="currentView() !== 'menu'"
+            [class.bg-white/5]="currentView() === 'menu'"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mb-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span class="text-[9px] font-medium tracking-wide">{{ dataService.t().nav_menu }}</span>
+          </button>
+
+        </div>
+      </nav>
+    </div>
+  </div>
+}
